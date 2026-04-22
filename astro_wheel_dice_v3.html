@@ -1,1 +1,122 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IrisSkies Astro Wheel + Dice</title>
+
+<style>
+body {
+  margin:0;
+  background:#f0f0f0;
+  font-family:Arial;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+/* WHEEL */
+.wheel {
+  position:relative;
+  width:500px;
+  height:500px;
+  border:5px solid black;
+  border-radius:50%;
+  margin-top:30px;
+}
+
+.line {
+  position:absolute;
+  width:2px;
+  height:250px;
+  background:black;
+  left:50%;
+  top:0;
+  transform-origin:bottom center;
+}
+
+.number {
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform-origin:0 0;
+  font-size:16px;
+}
+
+/* DICE */
+.dice-box {
+  margin-top:40px;
+  text-align:center;
+}
+
+button {
+  padding:10px 20px;
+  font-size:16px;
+  cursor:pointer;
+}
+
+.result {
+  margin-top:10px;
+  font-size:18px;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Astrology Wheel</h2>
+
+<div class="wheel" id="wheel"></div>
+
+<div class="dice-box">
+  <h2>Astro Dice</h2>
+  <button onclick="rollDice()">Spin Dice</button>
+  <div class="result" id="result"></div>
+</div>
+
+<script>
+// DRAW WHEEL
+const wheel = document.getElementById("wheel");
+
+for(let i=0;i<12;i++){
+  let angle = i * 30;
+
+  // lines
+  let line = document.createElement("div");
+  line.className = "line";
+  line.style.transform = `rotate(${angle}deg)`;
+  wheel.appendChild(line);
+
+  // numbers (tighter + centered)
+  let num = document.createElement("div");
+  num.className = "number";
+
+  let radius = 90; // tighter placement
+  let rad = (angle + 15) * Math.PI/180;
+
+  let x = Math.cos(rad)*radius;
+  let y = Math.sin(rad)*radius;
+
+  num.style.transform = `translate(${x}px, ${y}px)`;
+
+  num.innerText = (i+1);
+  wheel.appendChild(num);
+}
+
+// DICE
+const planets = ["Sun","Moon","Mercury","Venus","Mars","Jupiter","Saturn","Uranus","Neptune","Pluto","North Node","South Node"];
+const signs = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+
+function rollDice(){
+  let p = planets[Math.floor(Math.random()*12)];
+  let s = signs[Math.floor(Math.random()*12)];
+  let h = Math.floor(Math.random()*12)+1;
+
+  document.getElementById("result").innerText =
+    `${p} in ${s} in House ${h}`;
+}
+</script>
+
+</body>
+</html>
