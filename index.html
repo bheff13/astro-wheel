@@ -7,114 +7,119 @@
 
 <style>
 body {
-  margin:0;
-  background:#f0f0f0;
-  font-family:Arial;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
+    margin: 0;
+    background: #f0f0f0;
+    font-family: Arial;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-/* WHEEL */
-.wheel {
-  position:relative;
-  width:500px;
-  height:500px;
-  border:5px solid black;
-  border-radius:50%;
-  margin-top:30px;
+canvas {
+    margin-top: 20px;
 }
 
-.line {
-  position:absolute;
-  width:2px;
-  height:250px;
-  background:black;
-  left:50%;
-  top:0;
-  transform-origin:bottom center;
+/* Dice */
+.dice-container {
+    display: flex;
+    gap: 20px;
+    margin-top: 30px;
 }
 
-.number {
-  position:absolute;
-  left:50%;
-  top:50%;
-  transform-origin:0 0;
-  font-size:16px;
+.die {
+    width: 80px;
+    height: 80px;
+    background: white;
+    border: 2px solid #111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 1s;
 }
 
-/* DICE */
-.dice-box {
-  margin-top:40px;
-  text-align:center;
-}
-
-button {
-  padding:10px 20px;
-  font-size:16px;
-  cursor:pointer;
+.spin {
+    transform: rotateX(720deg) rotateY(720deg);
 }
 
 .result {
-  margin-top:10px;
-  font-size:18px;
+    margin-top: 20px;
+    font-size: 18px;
 }
 </style>
 </head>
 
 <body>
 
-<h2>Astrology Wheel</h2>
+<h2>IrisSkies Astro Wheel + Dice</h2>
 
-<div class="wheel" id="wheel"></div>
+<canvas id="wheel" width="400" height="400"></canvas>
 
-<div class="dice-box">
-  <h2>Astro Dice</h2>
-  <button onclick="rollDice()">Spin Dice</button>
-  <div class="result" id="result"></div>
+<div class="dice-container">
+    <div class="die" id="planet">Planet</div>
+    <div class="die" id="sign">Sign</div>
+    <div class="die" id="house">House</div>
 </div>
+
+<div class="result" id="result"></div>
 
 <script>
 // DRAW WHEEL
-const wheel = document.getElementById("wheel");
+const canvas = document.getElementById("wheel");
+const ctx = canvas.getContext("2d");
 
-for(let i=0;i<12;i++){
-  let angle = i * 30;
+const cx = 200;
+const cy = 200;
+const radius = 150;
 
-  // lines
-  let line = document.createElement("div");
-  line.className = "line";
-  line.style.transform = `rotate(${angle}deg)`;
-  wheel.appendChild(line);
+for (let i = 0; i < 12; i++) {
+    let angle = (i * 30) * Math.PI / 180;
 
-  // numbers (tighter + centered)
-  let num = document.createElement("div");
-  num.className = "number";
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + radius * Math.cos(angle), cy + radius * Math.sin(angle));
+    ctx.stroke();
 
-  let radius = 90; // tighter placement
-  let rad = (angle + 15) * Math.PI/180;
-
-  let x = Math.cos(rad)*radius;
-  let y = Math.sin(rad)*radius;
-
-  num.style.transform = `translate(${x}px, ${y}px)`;
-
-  num.innerText = (i+1);
-  wheel.appendChild(num);
+    // house numbers centered
+    let mid = angle + (15 * Math.PI / 180);
+    ctx.fillText(i + 1,
+        cx + (radius - 40) * Math.cos(mid),
+        cy + (radius - 40) * Math.sin(mid)
+    );
 }
 
-// DICE
-const planets = ["Sun","Moon","Mercury","Venus","Mars","Jupiter","Saturn","Uranus","Neptune","Pluto","North Node","South Node"];
+// DATA
+const planets = ["Sun","Moon","Mercury","Venus","Mars","Jupiter","Saturn","Uranus","Neptune","Pluto"];
 const signs = ["Aries","Taurus","Gemini","Cancer","Leo","Virgo","Libra","Scorpio","Sagittarius","Capricorn","Aquarius","Pisces"];
+const houses = ["1st","2nd","3rd","4th","5th","6th","7th","8th","9th","10th","11th","12th"];
 
-function rollDice(){
-  let p = planets[Math.floor(Math.random()*12)];
-  let s = signs[Math.floor(Math.random()*12)];
-  let h = Math.floor(Math.random()*12)+1;
+// DICE FUNCTION
+function rollDice() {
+    const p = planets[Math.floor(Math.random() * planets.length)];
+    const s = signs[Math.floor(Math.random() * signs.length)];
+    const h = houses[Math.floor(Math.random() * houses.length)];
 
-  document.getElementById("result").innerText =
-    `${p} in ${s} in House ${h}`;
+    document.getElementById("planet").classList.add("spin");
+    document.getElementById("sign").classList.add("spin");
+    document.getElementById("house").classList.add("spin");
+
+    setTimeout(() => {
+        document.getElementById("planet").innerText = p;
+        document.getElementById("sign").innerText = s;
+        document.getElementById("house").innerText = h;
+
+        document.getElementById("result").innerText =
+            p + " in " + s + " in the " + h + " house";
+
+        document.querySelectorAll(".die").forEach(d => d.classList.remove("spin"));
+    }, 1000);
 }
+
+// CLICK TO ROLL
+document.querySelectorAll(".die").forEach(d => {
+    d.onclick = rollDice;
+});
 </script>
 
 </body>
